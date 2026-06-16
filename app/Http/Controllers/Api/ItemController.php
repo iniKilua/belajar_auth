@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use illuminate\Http\JsonResponse;
 use App\Models\ItemModel;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -33,7 +34,7 @@ class ItemController extends Controller
     {
             $validator = Validator::make(request()->all(), [
                 'name' => 'required|string|max:50',
-                'code' => 'nullable|string',
+                'code' => 'required|string',
                 'price' => 'required|numeric',
             ]);
     
@@ -45,7 +46,7 @@ class ItemController extends Controller
                 ], 422);
             }
     
-            $item = ItemModel::create($validator->validated());
+        $item = ItemModel::create($validator->validated());
     
             return response()->json([
                 'status' => 'success',
@@ -59,15 +60,26 @@ class ItemController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
     }
 
     /**
      * Display the specified resource.
      */
-    public function showItem(ItemModel $itemModel)
+    public function showItem(String $id)
     {
-        //
+        try{
+            $item = ItemModel::findOrFail($id);
+            return response()->json([
+                'status' => 'success',
+                'data' => $item
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to retrieve item: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -83,21 +95,28 @@ class ItemController extends Controller
      */
     public function updateItem(UpdateItemRequest $request, $id  )
     {
-    try{
-        $item = ItemModel::findOrFail($id);
-        $item->update($request->validated());
+      $validated = $request->validated();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Item successfully updated',
-            'data' => $item
-        ], 200);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Failed to update item: ' . $e->getMessage()
-        ], 500);
-    }
+        try {
+            $item = ItemModel::findOrFail($id);
+            $item->update($validated);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Item successfully updated',
+                'data' => $item
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to update item: ' . $e->getMessage()
+            ], 500);
+        } catch (JWTException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to update item, token invalid: ' . $e->getMessage()
+            ], 500);
+        }  
     }
     /**
      * Remove the specified resource from storage.

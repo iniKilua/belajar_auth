@@ -19,7 +19,7 @@ Route::prefix('auth')->name('auth.')->group(function () {
         route::post('addItem', [ItemController::class, 'addItem'])->name('addItem');
         route::put('updateItem/{id}', [ItemController::class, 'updateItem'])->name('updateItem');
         route::delete('deleteItem/{id}', [ItemController::class, 'deleteItem'])->name('deleteItem');
-       
+        route::get('showItem/{id}', [ItemController::class, 'showItem'])->name('showItem');
     });
 });
 
