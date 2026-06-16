@@ -18,7 +18,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name'     => 'required|string|max:255',
+            'name'     => 'required|string|max:50',
             'email'    => 'required|email|unique:users',
             'password' => 'required|string|min:6|confirmed',
         ]);
@@ -52,7 +52,7 @@ class AuthController extends Controller
     }
 
     // Update data user yang sedang login
-    public function update(Request $request)
+    public function updateUser(Request $request)
     {
     // 1. Ambil data user yang sedang login berdasarkan token JWT
     $user = auth()->user(); 
